@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Rocket Shooting Game</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -21,11 +24,42 @@
             width: 100vw;
             height: 100vh;
         }
+        .leaderboard-link {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 20px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <script>
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getDatabase, ref, push, query, orderByChild, limitToLast, get }
+          from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+      
+        // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyBMVusLN5bhGncxW4PIYRaxqU6buujdf2k",
+          authDomain: "flighgamescores.firebaseapp.com",
+          databaseURL: "https://flighgamescores-default-rtdb.firebaseio.com",
+          projectId: "flighgamescores",
+          storageBucket: "flighgamescores.firebasestorage.app",
+          messagingSenderId: "646294478907",
+          appId: "1:646294478907:web:04cdba902ef2f5c5fe3c1e",
+          measurementId: "G-6HXTYBD1TH"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let scale, gameOver, score, lastShotTime;
@@ -211,17 +245,52 @@
 
         function gameLoop() {
             if (gameOver) {
+                // Ask for player name and save score to Firebase
+                let playerName = prompt("Enter your name for the leaderboard:");
+                if (!playerName) playerName = "Unknown Player"; // Default name if empty
+                saveScoreOnline(playerName, score);
+
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';  // Dark overlay
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.fillStyle = 'red';
                 ctx.font = `${50 * scale}px Arial`;
                 ctx.textAlign = 'center';
-                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20 * scale);
+                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 50 * scale);
 
                 ctx.fillStyle = 'white';
                 ctx.font = `${25 * scale}px Arial`;
-                ctx.fillText('Press ENTER to Restart', canvas.width / 2, canvas.height / 2 + 30 * scale);
+                ctx.fillText('Press ENTER to Restart', canvas.width / 2, canvas.height / 2 + 20 * scale);
+
+                // Add a clickable leaderboard link
+                let leaderboardText = "View Leaderboard";
+                let leaderboardX = canvas.width / 2;
+                let leaderboardY = canvas.height / 2 + 60 * scale;
+
+                ctx.fillStyle = 'blue';
+                ctx.font = `${20 * scale}px Arial`;
+                ctx.fillText(leaderboardText, leaderboardX, leaderboardY);
+
+                // Detect click on leaderboard link
+                canvas.addEventListener('click', function handleLeaderboardClick(event) {
+                    let rect = canvas.getBoundingClientRect();
+                    let x = event.clientX - rect.left;
+                    let y = event.clientY - rect.top;
+
+                    let textWidth = ctx.measureText(leaderboardText).width;
+                    let textHeight = 20 * scale; // Approximate height of text
+
+                    if (
+                        x >= leaderboardX - textWidth / 2 &&
+                        x <= leaderboardX + textWidth / 2 &&
+                        y >= leaderboardY - textHeight / 2 &&
+                        y <= leaderboardY + textHeight / 2
+                    ) {
+                        window.open('https://fluttercentral.com/games/FlightGameLeaderboard.html', '_blank'); // Replace with actual URL
+                    }
+                }, { once: true });
+
+                fetchLeaderboard(); // Fetch and display leaderboard
                 return;
             }
 
@@ -307,6 +376,53 @@
             }
         }
 
+        function saveScoreOnline(playerName, score) {
+            const leaderboardRef = ref(db, "leaderboard");
+            push(leaderboardRef, {
+                name: playerName,
+                score: score
+            }).then(() => {
+                console.log("Score saved successfully!");
+            }).catch(error => {
+                console.error("Error saving score:", error);
+            });
+        }
+
+
+        function fetchLeaderboard() {
+            const leaderboardRef = query(ref(db, "leaderboard"), orderByChild("score"), limitToLast(5));
+            get(leaderboardRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    let scores = [];
+                    snapshot.forEach(childSnapshot => {
+                        scores.push(childSnapshot.val());
+                    });
+                    scores.sort((a, b) => b.score - a.score); // Sort in descending order
+                    drawOnlineLeaderboard(scores);
+                } else {
+                    console.log("No leaderboard data available");
+                }
+            }).catch(error => {
+                console.error("Error fetching leaderboard:", error);
+            });
+        }
+
+
+        function drawOnlineLeaderboard(scores) {
+            const ctx = document.getElementById('gameCanvas').getContext('2d');
+            const scale = Math.max(window.innerWidth / 800, 1);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(window.innerWidth / 2 - 150 * scale, window.innerHeight / 2 + 50 * scale, 300 * scale, 180 * scale);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = `${25 * scale}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('Global Leaderboard', window.innerWidth / 2, window.innerHeight / 2 + 80 * scale);
+
+            scores.forEach((s, i) => {
+                ctx.fillText(`${i + 1}. ${s.name}: ${s.score}`, window.innerWidth / 2, window.innerHeight / 2 + 120 * scale + i * 30 * scale);
+            });
+        }
 
 
         lastShotTime = 0;

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FlighGameScores Leaderboard</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>FlighGameScores Leaderboard</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Player Name</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Firebase data will be inserted here -->
+    </tbody>
+  </table>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBMVusLN5bhGncxW4PIYRaxqU6buujdf2k",
+        authDomain: "flighgamescores.firebaseapp.com",
+        databaseURL: "https://flighgamescores-default-rtdb.firebaseio.com",
+        projectId: "flighgamescores",
+        storageBucket: "flighgamescores.firebasestorage.app",
+        messagingSenderId: "646294478907",
+        appId: "1:646294478907:web:04cdba902ef2f5c5fe3c1e",
+        measurementId: "G-6HXTYBD1TH"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Get a reference to the database
+    const database = firebase.database();
+
+    // Get a reference to the leaderboard data
+    const leaderboardRef = database.ref('leaderboard');
+
+    // Listen for changes to the leaderboard data
+    leaderboardRef.on('value', (snapshot) => {
+      // Clear the table body
+      const tableBody = document.querySelector('tbody');
+      tableBody.innerHTML = '';
+
+      // Get the leaderboard data as an array
+      const leaderboardData = snapshot.val();
+
+      // Sort the leaderboard data by score in descending order
+      const sortedLeaderboardData = Object.entries(leaderboardData).sort((a, b) => b[1].score - a[1].score);
+
+      // Add each player to the table
+      let rank = 1;
+      sortedLeaderboardData.forEach(([playerId, playerData]) => {
+        const row = tableBody.insertRow();
+        const rankCell = row.insertCell();
+        const nameCell = row.insertCell();
+        const scoreCell = row.insertCell();
+
+        rankCell.textContent = rank;
+        nameCell.textContent = playerData.name;
+        scoreCell.textContent = playerData.score;
+
+        rank++;
+      });
+    });
+  </script>
+
+</body>
+</html>
