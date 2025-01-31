@@ -506,7 +506,7 @@
             ctx.textAlign = 'center';
 
             ctx.font = `${18 * scale}px Arial`;
-            ctx.fillText('🚀 Rocket Shooting Game - V1.10 🚀', canvas.width / 2, canvas.height / 3 - 20);
+            ctx.fillText('🚀 Rocket Shooting Game - V1.11 🚀', canvas.width / 2, canvas.height / 3 - 20);
 
             ctx.font = `${16 * scale}px Arial`;
             ctx.fillText('Double-Tap to Start', canvas.width / 2, canvas.height / 2);
@@ -531,7 +531,7 @@
             const existingOverlay = document.getElementById("overlay");
             if (existingOverlay) existingOverlay.remove();
 
-            // Create a full-screen overlay
+            // Create a full-screen solid black overlay
             let overlay = document.createElement("div");
             overlay.id = "overlay";
             overlay.style.position = "fixed";
@@ -539,13 +539,24 @@
             overlay.style.left = "0";
             overlay.style.width = "100vw";
             overlay.style.height = "100vh";
-            overlay.style.background = "black"; // Dark semi-transparent overlay
+            overlay.style.background = "black"; // Solid background
             overlay.style.zIndex = "999"; // Ensures it's above everything
             document.body.appendChild(overlay);
 
-            // Remove existing input if any
-            const existingInput = document.getElementById("usernameInput");
-            if (existingInput) existingInput.remove();
+            // Create heading
+            let heading = document.createElement("h2");
+            heading.id = "nameHeading";
+            heading.innerText = "Enter Your Name";
+            heading.style.position = "absolute";
+            heading.style.top = "30%";
+            heading.style.left = "50%";
+            heading.style.transform = "translate(-50%, -50%)";
+            heading.style.color = "white";
+            heading.style.fontSize = "24px";
+            heading.style.fontFamily = "Arial, sans-serif";
+            heading.style.zIndex = "1001";
+
+            document.body.appendChild(heading);
 
             // Create input box
             let input = document.createElement("input");
@@ -595,6 +606,7 @@
             button.addEventListener("click", saveUsername);
         }
 
+
         function saveUsername() {
             let input = document.getElementById("usernameInput");
             if (input && input.value.trim() !== "") {
@@ -605,7 +617,9 @@
 
                 // Remove input, button, and overlay
                 input.remove();
+                
                 document.querySelector("button").remove();
+                document.getElementById("nameHeading").remove();
                 document.getElementById("overlay").remove();
 
                 // Redraw the start screen with the new username
