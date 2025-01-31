@@ -487,7 +487,7 @@
                 }
             } else {
                 console.log("❌ Not running inside Telegram WebView.");
-                window.telegramPlayerName = "ExternalPlayer";
+                window.telegramPlayerName = "Guest";
                 playerName = window.telegramPlayerName;
             }
 
@@ -496,7 +496,8 @@
         });
 
 
-        function drawStartScreen() {
+        function drawStartScreen() {            
+            
             ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -504,49 +505,121 @@
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
 
-            // // Welcome message (fixed incorrect subtraction)
-            // playerName = window.telegramPlayerName || "Guest"; // Default to "Player" if not set
-
-            // if (window.Telegram && window.Telegram.WebApp) {
-            //     window.Telegram.WebApp.ready();  // Ensures the WebApp API is ready
-            //     window.Telegram.WebApp.expand(); // Expands the web app to full screen
-
-            //     playerName = "TelegramGuest";
-
-            //     const user = window.Telegram.WebApp.initDataUnsafe?.user;
-
-            //     if (user) {
-            //         const telegramUsername = user.username || `User${user.id}`;
-            //         console.log("Telegram Username:", telegramUsername);
-                    
-            //         // You can use this username in your game logic, for example:
-            //         window.telegramPlayerName = telegramUsername;
-            //         playerName = telegramUsername;
-            //     }
-            // } else {
-            //     console.log("Not running inside Telegram WebView");
-            // }
-
             ctx.font = `${18 * scale}px Arial`;
-            ctx.fillText(`Welcome ${playerName}`, canvas.width / 2, canvas.height / 3 - 70); // Adjusted positioning
+            ctx.fillText('🚀 Rocket Shooting Game - V1.10 🚀', canvas.width / 2, canvas.height / 3 - 20);
 
-            // Game title
-            ctx.font = `${18 * scale}px Arial`;
-            ctx.fillText('🚀 Rocket Shooting Game - V1.10 🚀', canvas.width / 2, canvas.height / 3 + 20);
-
-            // Instructions
             ctx.font = `${16 * scale}px Arial`;
             ctx.fillText('Double-Tap to Start', canvas.width / 2, canvas.height / 2);
             ctx.fillText('or Press Enter', canvas.width / 2, canvas.height / 2 + 40);
 
-            // Leaderboard link
             ctx.fillStyle = 'blue';
             ctx.font = `${15 * scale}px Arial`;
             ctx.fillText('View Leaderboard', canvas.width / 2, canvas.height / 2 + 100);
+
+            // If the player is a guest, show an input field
+            if (window.telegramPlayerName === "Guest") {
+                showUsernameInput();
+            } else {
+                ctx.fillStyle = 'white';
+                ctx.font = `${18 * scale}px Arial`;
+                ctx.fillText(`Welcome ${window.telegramPlayerName}`, canvas.width / 2, canvas.height / 3 - 70);
+            }
+        }
+
+        function showUsernameInput() {
+            // Remove existing overlay if any
+            const existingOverlay = document.getElementById("overlay");
+            if (existingOverlay) existingOverlay.remove();
+
+            // Create a full-screen overlay
+            let overlay = document.createElement("div");
+            overlay.id = "overlay";
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100vw";
+            overlay.style.height = "100vh";
+            overlay.style.background = "black"; // Dark semi-transparent overlay
+            overlay.style.zIndex = "999"; // Ensures it's above everything
+            document.body.appendChild(overlay);
+
+            // Remove existing input if any
+            const existingInput = document.getElementById("usernameInput");
+            if (existingInput) existingInput.remove();
+
+            // Create input box
+            let input = document.createElement("input");
+            input.type = "text";
+            input.id = "usernameInput";
+            input.placeholder = "Enter your name";
+            input.style.position = "absolute";
+            input.style.top = "40%";
+            input.style.left = "50%";
+            input.style.transform = "translate(-50%, -50%)";
+            input.style.padding = "12px";
+            input.style.fontSize = "20px";
+            input.style.border = "2px solid white";
+            input.style.background = "black";
+            input.style.color = "white";
+            input.style.textAlign = "center";
+            input.style.zIndex = "1001"; // Above the overlay
+
+            document.body.appendChild(input);
+
+            // Focus on input box
+            input.focus();
+
+            // Handle Enter key to submit name
+            input.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    saveUsername();
+                }
+            });
+
+            // Create a submit button
+            let button = document.createElement("button");
+            button.innerText = "Save Name";
+            button.style.position = "absolute";
+            button.style.top = "50%";
+            button.style.left = "50%";
+            button.style.transform = "translate(-50%, -50%)";
+            button.style.padding = "12px 24px";
+            button.style.fontSize = "18px";
+            button.style.cursor = "pointer";
+            button.style.border = "2px solid white";
+            button.style.background = "white";
+            button.style.color = "black";
+            button.style.zIndex = "1001"; // Above the overlay
+
+            document.body.appendChild(button);
+            button.addEventListener("click", saveUsername);
+        }
+
+        function saveUsername() {
+            let input = document.getElementById("usernameInput");
+            if (input && input.value.trim() !== "") {
+                window.telegramPlayerName = input.value.trim(); // Update global username
+                playerName = input.value.trim();
+
+                console.log("✅ Updated Username:", playerName);
+
+                // Remove input, button, and overlay
+                input.remove();
+                document.querySelector("button").remove();
+                document.getElementById("overlay").remove();
+
+                // Redraw the start screen with the new username
+                drawStartScreen();
+            }
         }
 
 
         function startGame() {
+            if (!window.telegramPlayerName || window.telegramPlayerName === "Guest") {
+                alert("Please enter your name before starting the game!");
+                return;
+            }
+
             if (gameStarted) return;
             gameStarted = true;
             gameOver = false;
