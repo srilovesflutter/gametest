@@ -239,7 +239,7 @@
             ctx.fillStyle = 'white';
             ctx.font = `${30 * scale}px Arial`;
             ctx.textAlign = 'right'; 
-            ctx.fillText(`Score: ${score}`, canvas.width - 20 * scale, 40 * scale);
+            ctx.fillText(`V1 Score: ${score}`, canvas.width - 20 * scale, 40 * scale);
         }
 
 
@@ -265,10 +265,12 @@
             drawEnemies();
             drawScore();
 
-            requestAnimationFrame(gameLoop);
+            animationFrameId = requestAnimationFrame(gameLoop);
         }
 
         function drawGameOverScreen() {
+
+
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -283,33 +285,36 @@
 
             // Add a clickable leaderboard link
             let leaderboardText = "View Leaderboard";
-                let leaderboardX = canvas.width / 2;
-                let leaderboardY = canvas.height / 2 + 60 * scale;
+            let leaderboardX = canvas.width / 2;
+            let leaderboardY = canvas.height / 2 + 60 * scale;
 
-                ctx.fillStyle = 'blue';
-                ctx.font = `${20 * scale}px Arial`;
-                ctx.fillText(leaderboardText, leaderboardX, leaderboardY);
+            ctx.fillStyle = 'blue';
+            ctx.font = `${20 * scale}px Arial`;
+            ctx.fillText(leaderboardText, leaderboardX, leaderboardY);
 
-                // Detect click on leaderboard link
-                canvas.addEventListener('click', function handleLeaderboardClick(event) {
-                    let rect = canvas.getBoundingClientRect();
-                    let x = event.clientX - rect.left;
-                    let y = event.clientY - rect.top;
+            // Detect click on leaderboard link
+            canvas.addEventListener('click', function handleLeaderboardClick(event) {
+                let rect = canvas.getBoundingClientRect();
+                let x = event.clientX - rect.left;
+                let y = event.clientY - rect.top;
 
-                    let textWidth = ctx.measureText(leaderboardText).width;
-                    let textHeight = 20 * scale; // Approximate height of text
+                let textWidth = ctx.measureText(leaderboardText).width;
+                let textHeight = 20 * scale; // Approximate height of text
 
-                    if (
-                        x >= leaderboardX - textWidth / 2 &&
-                        x <= leaderboardX + textWidth / 2 &&
-                        y >= leaderboardY - textHeight / 2 &&
-                        y <= leaderboardY + textHeight / 2
-                    ) {
-                        window.open('https://fluttercentral.com/games/FlightGameLeaderboard.html', ''); // Replace with actual URL
-                    }
-                }, { once: true });
+                if (
+                    x >= leaderboardX - textWidth / 2 &&
+                    x <= leaderboardX + textWidth / 2 &&
+                    y >= leaderboardY - textHeight / 2 &&
+                    y <= leaderboardY + textHeight / 2
+                ) {
+                    window.open('https://fluttercentral.com/games/FlightGameLeaderboard.html', ''); // Replace with actual URL
+                }
+            }, { once: true });
 
-                cancelAnimationFrame(gameLoop);
+
+            cancelAnimationFrame(animationFrameId);
+
+
         }
 
 
