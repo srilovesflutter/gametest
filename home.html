@@ -476,11 +476,13 @@
             ctx.textAlign = 'center';
 
             // Welcome message (fixed incorrect subtraction)
-            playerName = window.telegramPlayerName || "Player"; // Default to "Player" if not set
+            playerName = window.telegramPlayerName || "Guest"; // Default to "Player" if not set
 
             if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();  // Ensures the WebApp API is ready
                 window.Telegram.WebApp.expand(); // Expands the web app to full screen
-                const user = window.Telegram.WebApp.initDataUnsafe.user;
+
+                const user = window.Telegram.WebApp.initDataUnsafe?.user;
 
                 if (user) {
                     const telegramUsername = user.username || `User${user.id}`;
@@ -499,7 +501,7 @@
 
             // Game title
             ctx.font = `${18 * scale}px Arial`;
-            ctx.fillText('🚀 Rocket Shooting Game - V1.5 🚀', canvas.width / 2, canvas.height / 3 + 20);
+            ctx.fillText('🚀 Rocket Shooting Game - V1.6 🚀', canvas.width / 2, canvas.height / 3 + 20);
 
             // Instructions
             ctx.font = `${16 * scale}px Arial`;
