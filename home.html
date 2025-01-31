@@ -483,10 +483,12 @@
                 } else {
                     console.log("❌ No user data found in Telegram WebApp.");
                     window.telegramPlayerName = "Guest";
+                    playerName = window.telegramPlayerName;
                 }
             } else {
                 console.log("❌ Not running inside Telegram WebView.");
                 window.telegramPlayerName = "ExternalPlayer";
+                playerName = window.telegramPlayerName;
             }
         });
 
