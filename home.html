@@ -6,6 +6,7 @@
     <title>Responsive Rocket Shooting Game</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
         * {
@@ -467,6 +468,28 @@
             });
         }
 
+        document.addEventListener("DOMContentLoaded", () => {
+            if (window.Telegram && window.Telegram.WebApp) {
+                console.log("✅ Telegram WebApp API detected!");
+
+                window.Telegram.WebApp.ready();  // Ensure it's initialized
+                window.Telegram.WebApp.expand(); // Expand to full screen
+
+                const user = window.Telegram.WebApp.initDataUnsafe?.user;
+                if (user) {
+                    window.telegramPlayerName = user.username || `User${user.id}`;
+                    console.log("✅ Telegram Username:", window.telegramPlayerName);
+                    playerName = window.telegramPlayerName;
+                } else {
+                    console.log("❌ No user data found in Telegram WebApp.");
+                    window.telegramPlayerName = "Guest";
+                }
+            } else {
+                console.log("❌ Not running inside Telegram WebView.");
+            }
+        });
+
+
         function drawStartScreen() {
             ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -475,35 +498,35 @@
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
 
-            // Welcome message (fixed incorrect subtraction)
-            playerName = window.telegramPlayerName || "Guest"; // Default to "Player" if not set
+            // // Welcome message (fixed incorrect subtraction)
+            // playerName = window.telegramPlayerName || "Guest"; // Default to "Player" if not set
 
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.ready();  // Ensures the WebApp API is ready
-                window.Telegram.WebApp.expand(); // Expands the web app to full screen
+            // if (window.Telegram && window.Telegram.WebApp) {
+            //     window.Telegram.WebApp.ready();  // Ensures the WebApp API is ready
+            //     window.Telegram.WebApp.expand(); // Expands the web app to full screen
 
-                playerName = "TelegramGuest";
+            //     playerName = "TelegramGuest";
 
-                const user = window.Telegram.WebApp.initDataUnsafe?.user;
+            //     const user = window.Telegram.WebApp.initDataUnsafe?.user;
 
-                if (user) {
-                    const telegramUsername = user.username || `User${user.id}`;
-                    console.log("Telegram Username:", telegramUsername);
+            //     if (user) {
+            //         const telegramUsername = user.username || `User${user.id}`;
+            //         console.log("Telegram Username:", telegramUsername);
                     
-                    // You can use this username in your game logic, for example:
-                    window.telegramPlayerName = telegramUsername;
-                    playerName = telegramUsername;
-                }
-            } else {
-                console.log("Not running inside Telegram WebView");
-            }
+            //         // You can use this username in your game logic, for example:
+            //         window.telegramPlayerName = telegramUsername;
+            //         playerName = telegramUsername;
+            //     }
+            // } else {
+            //     console.log("Not running inside Telegram WebView");
+            // }
 
             ctx.font = `${18 * scale}px Arial`;
             ctx.fillText(`Welcome ${playerName}`, canvas.width / 2, canvas.height / 3 - 70); // Adjusted positioning
 
             // Game title
             ctx.font = `${18 * scale}px Arial`;
-            ctx.fillText('🚀 Rocket Shooting Game - V1.7 🚀', canvas.width / 2, canvas.height / 3 + 20);
+            ctx.fillText('🚀 Rocket Shooting Game - V1.8 🚀', canvas.width / 2, canvas.height / 3 + 20);
 
             // Instructions
             ctx.font = `${16 * scale}px Arial`;
