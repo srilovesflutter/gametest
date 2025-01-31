@@ -329,6 +329,8 @@
         let touchStartY = null;
 
         canvas.addEventListener('touchstart', (e) => {
+            if (gameOver) resetGame();
+            
             const touch = e.touches[0];
             touchStartX = touch.clientX;
             touchStartY = touch.clientY;
