@@ -240,7 +240,7 @@
             ctx.fillStyle = 'white';
             ctx.font = `${30 * scale}px Arial`;
             ctx.textAlign = 'right'; 
-            ctx.fillText(`V1.1 Score: ${score}`, canvas.width - 20 * scale, 40 * scale);
+            ctx.fillText(`V1.2 Score: ${score}`, canvas.width - 20 * scale, 40 * scale);
         }
 
 
@@ -337,14 +337,6 @@
         let touchStartTime = 0;
         let touchCount = 0;
 
-        canvas.addEventListener('touchstart', (e) => {
-            touchCount++;
-            if (touchCount === 2) {
-                startGame();
-            }
-            setTimeout(() => { touchCount = 0; }, 300); // Reset double-tap detection
-        });
-
         canvas.addEventListener('click', (event) => {
             let rect = canvas.getBoundingClientRect();
             let x = event.clientX - rect.left;
@@ -371,7 +363,11 @@
         let touchStartY = null;
 
         canvas.addEventListener('touchstart', (e) => {
-            if (gameOver) resetGame();
+            touchCount++;
+            if (touchCount === 2) {
+                startGame();
+            }
+            setTimeout(() => { touchCount = 0; }, 300); // Reset double-tap detection
             
             const touch = e.touches[0];
             touchStartX = touch.clientX;
