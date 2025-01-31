@@ -250,20 +250,39 @@
                 if (!playerName) playerName = "Unknown Player"; // Default name if empty
                 saveScoreOnline(playerName, score);
 
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';  // Dark overlay
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                drawGameOverScreen();
+                return;
+            }
 
-                ctx.fillStyle = 'red';
-                ctx.font = `${50 * scale}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 50 * scale);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            moveRocket();
+            updateBullets();
+            updateEnemies();
+            checkCollisions();
 
-                ctx.fillStyle = 'white';
-                ctx.font = `${25 * scale}px Arial`;
-                ctx.fillText('Press ENTER to Restart', canvas.width / 2, canvas.height / 2 + 20 * scale);
+            drawRocket();
+            drawBullets();
+            drawEnemies();
+            drawScore();
 
-                // Add a clickable leaderboard link
-                let leaderboardText = "View Leaderboard";
+            requestAnimationFrame(gameLoop);
+        }
+
+        function drawGameOverScreen() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'red';
+            ctx.font = `${50 * scale}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 50 * scale);
+
+            ctx.fillStyle = 'white';
+            ctx.font = `${25 * scale}px Arial`;
+            ctx.fillText('Press ENTER to Restart', canvas.width / 2, canvas.height / 2 + 20 * scale);
+
+            // Add a clickable leaderboard link
+            let leaderboardText = "View Leaderboard";
                 let leaderboardX = canvas.width / 2;
                 let leaderboardY = canvas.height / 2 + 60 * scale;
 
@@ -286,28 +305,11 @@
                         y >= leaderboardY - textHeight / 2 &&
                         y <= leaderboardY + textHeight / 2
                     ) {
-                        window.open('https://fluttercentral.com/games/FlightGameLeaderboard.html', '_blank'); // Replace with actual URL
+                        window.open('https://fluttercentral.com/games/FlightGameLeaderboard.html', ''); // Replace with actual URL
                     }
                 }, { once: true });
-
-                fetchLeaderboard(); // Fetch and display leaderboard
-                return;
-            }
-
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            moveRocket();
-            updateBullets();
-            updateEnemies();
-            checkCollisions();
-
-            drawRocket();
-            drawBullets();
-            drawEnemies();
-            drawScore();
-
-            requestAnimationFrame(gameLoop);
         }
+
 
         function resetGame() {
             gameOver = false;
