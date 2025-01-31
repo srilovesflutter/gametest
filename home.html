@@ -506,7 +506,7 @@
             ctx.textAlign = 'center';
 
             ctx.font = `${18 * scale}px Arial`;
-            ctx.fillText('🚀 Rocket Shooting Game - V1.11 🚀', canvas.width / 2, canvas.height / 3 - 20);
+            ctx.fillText('🚀 Rocket Shooting Game - V1.12 🚀', canvas.width / 2, canvas.height / 3 - 20);
 
             ctx.font = `${16 * scale}px Arial`;
             ctx.fillText('Double-Tap to Start', canvas.width / 2, canvas.height / 2);
@@ -615,15 +615,17 @@
 
                 console.log("✅ Updated Username:", playerName);
 
-                // Remove input, button, and overlay
+                // Remove input, button, heading, and overlay
                 input.remove();
-                
                 document.querySelector("button").remove();
                 document.getElementById("nameHeading").remove();
                 document.getElementById("overlay").remove();
 
-                // Redraw the start screen with the new username
-                drawStartScreen();
+                // ✅ Clear the canvas before redrawing the start screen
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // ✅ Wait briefly before redrawing to avoid flickering
+                setTimeout(drawStartScreen, 100);
             }
         }
 
