@@ -100,6 +100,7 @@
 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
+        drawScore(); // Redraw the score after resizing
 
         const keys = {};
         document.addEventListener('keydown', (e) => keys[e.key] = true);
@@ -240,7 +241,7 @@
             ctx.fillStyle = 'white';
             ctx.font = `${30 * scale}px Arial`;
             ctx.textAlign = 'right'; 
-            ctx.fillText(`V1.2 Score: ${score}`, canvas.width - 20 * scale, 40 * scale);
+            ctx.fillText(`V1.3 Score: ${score}`, canvas.width - 20 * scale, 40 * scale);
         }
 
 
