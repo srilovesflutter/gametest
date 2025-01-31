@@ -60,27 +60,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let playerName;
-
-        // Check if running inside Telegram WebView
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.expand(); // Expands the web app to full screen
-            const user = window.Telegram.WebApp.initDataUnsafe.user;
-
-            if (user) {
-                const telegramUsername = user.username || `User${user.id}`;
-                console.log("Telegram Username:", telegramUsername);
-                
-                // You can use this username in your game logic, for example:
-                window.telegramPlayerName = telegramUsername;
-                playerName = telegramUsername;
-            }
-        } else {
-            console.log("Not running inside Telegram WebView");
-            playerName = "123";
-        }
-
-
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let scale, gameOver, score, lastShotTime, gameStarted = false;
@@ -497,12 +476,29 @@
 
             // Welcome message (fixed incorrect subtraction)
             const playerName = window.telegramPlayerName || "Player"; // Default to "Player" if not set
+
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.expand(); // Expands the web app to full screen
+                const user = window.Telegram.WebApp.initDataUnsafe.user;
+
+                if (user) {
+                    const telegramUsername = user.username || `User${user.id}`;
+                    console.log("Telegram Username:", telegramUsername);
+                    
+                    // You can use this username in your game logic, for example:
+                    window.telegramPlayerName = telegramUsername;
+                    playerName = telegramUsername;
+                }
+            } else {
+                console.log("Not running inside Telegram WebView");
+            }
+
             ctx.font = `${35 * scale}px Arial`;
-            ctx.fillText(`Welcome ${playerName}`, canvas.width / 2, canvas.height / 3 - 70); // Adjusted positioning
+            ctx.fillText(`Welcome ${playerName}`, canvas.width / 3, canvas.height / 3 - 70); // Adjusted positioning
 
             // Game title
             ctx.font = `${40 * scale}px Arial`;
-            ctx.fillText('🚀 Rocket Shooting Game - V1.3 🚀', canvas.width / 2, canvas.height / 3 + 20);
+            ctx.fillText('🚀 Rocket Shooting Game - V1.4 🚀', canvas.width / 2, canvas.height / 3 + 20);
 
             // Instructions
             ctx.font = `${25 * scale}px Arial`;
