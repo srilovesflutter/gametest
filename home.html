@@ -60,6 +60,24 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Check if running inside Telegram WebView
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.expand(); // Expands the web app to full screen
+            const user = window.Telegram.WebApp.initDataUnsafe.user;
+
+            if (user) {
+                const telegramUsername = user.username || `User${user.id}`;
+                console.log("Telegram Username:", telegramUsername);
+                
+                // You can use this username in your game logic, for example:
+                window.telegramPlayerName = telegramUsername;
+                playerName = telegramUsername;
+            }
+        } else {
+            console.log("Not running inside Telegram WebView");
+        }
+
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let scale, gameOver, score, lastShotTime, gameStarted = false;
@@ -248,7 +266,6 @@
         function gameLoop() {
             if (gameOver) {
                 // Ask for player name and save score to Firebase
-                let playerName = prompt("Enter your name for the leaderboard:");
                 if (!playerName) playerName = "Unknown Player"; // Default name if empty
                 saveScoreOnline(playerName, score);
 
@@ -470,6 +487,12 @@
         function drawStartScreen() {
             ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'white';
+            ctx.font = `${40 * scale}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('Welcome ' + playerName, canvas.width / 2, canvas.height / 3);
+
 
             ctx.fillStyle = 'white';
             ctx.font = `${40 * scale}px Arial`;
