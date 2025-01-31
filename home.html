@@ -66,6 +66,7 @@
         let bullets = [], enemies = [], enemyBullets = [];
         let touchX = null;
         let animationFrameId;
+        let playerName;
 
         const rocket = {
             x: 0,
@@ -475,7 +476,7 @@
             ctx.textAlign = 'center';
 
             // Welcome message (fixed incorrect subtraction)
-            const playerName = window.telegramPlayerName || "Player"; // Default to "Player" if not set
+            playerName = window.telegramPlayerName || "Player"; // Default to "Player" if not set
 
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.expand(); // Expands the web app to full screen
