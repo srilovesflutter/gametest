@@ -506,7 +506,7 @@
             ctx.textAlign = 'center';
 
             ctx.font = `${18 * scale}px Arial`;
-            ctx.fillText('🚀 Rocket Shooting Game - V1.12 🚀', canvas.width / 2, canvas.height / 3 - 20);
+            ctx.fillText('🚀 Rocket Shooting Game - V1.13 🚀', canvas.width / 2, canvas.height / 3 - 20);
 
             ctx.font = `${16 * scale}px Arial`;
             ctx.fillText('Double-Tap to Start', canvas.width / 2, canvas.height / 2);
@@ -574,11 +574,15 @@
             input.style.color = "white";
             input.style.textAlign = "center";
             input.style.zIndex = "1001"; // Above the overlay
+            input.style.width = "80%"; // Make sure it fits smaller screens
 
             document.body.appendChild(input);
 
             // Focus on input box
             input.focus();
+
+            // Detect keyboard pop-up and adjust input field
+            window.addEventListener("resize", adjustForKeyboard);
 
             // Handle Enter key to submit name
             input.addEventListener("keypress", function (event) {
@@ -606,6 +610,21 @@
             button.addEventListener("click", saveUsername);
         }
 
+        function adjustForKeyboard() {
+            let input = document.getElementById("usernameInput");
+            let button = document.querySelector("button");
+            let heading = document.getElementById("nameHeading");
+
+            if (window.innerHeight < 500) { // Keyboard is open
+                input.style.top = "20%";  // Move input higher
+                button.style.top = "35%";
+                heading.style.top = "15%";
+            } else { // Keyboard is closed
+                input.style.top = "40%";
+                button.style.top = "50%";
+                heading.style.top = "30%";
+            }
+        }
 
         function saveUsername() {
             let input = document.getElementById("usernameInput");
@@ -614,6 +633,9 @@
                 playerName = input.value.trim();
 
                 console.log("✅ Updated Username:", playerName);
+
+                // Remove event listener for keyboard resizing
+                window.removeEventListener("resize", adjustForKeyboard);
 
                 // Remove input, button, heading, and overlay
                 input.remove();
