@@ -3,29 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rocket Shooting Game - V1.14 (Further Improved)</title>
+  <title>Rocket Shooting Game - V1.15 (Persistent Username)</title>
   <!-- Firebase and Telegram scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
   <script async src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      background-color: black;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; background-color: black; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
   </style>
 </head>
 <body>
@@ -66,16 +52,16 @@
     let bullets = [], enemies = [], enemyBullets = [], explosions = [];
     let animationFrameId;
     let playerName;
-    
-    // New lives and invulnerability system
+
+    // Lives & invulnerability variables
     let lives = 3;
     let invulnerable = false;
 
-    // For background stars
+    // Background stars
     let stars = [];
     const STAR_COUNT = 50;
 
-    // Audio assets (supply your own files)
+    // Audio assets (ensure you supply these files)
     const shootSound = new Audio("shoot.mp3");
     const explosionSound = new Audio("explosion.mp3");
     const bgMusic = new Audio("bgMusic.mp3");
@@ -116,7 +102,6 @@
       initStars();
       drawStartScreen();
     }
-
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
@@ -136,19 +121,16 @@
     const keys = {};
     document.addEventListener("keydown", (e) => {
       keys[e.key] = true;
-      
-      // Toggle pause with "P" (only if game is in progress and not over)
+      // Toggle pause with "P"
       if (gameStarted && !gameOver && (e.key === "p" || e.key === "P")) {
         paused = !paused;
       }
       // Start/restart game with Enter
-      if (e.key === "Enter") {
-        if (!gameStarted || gameOver) startGame();
+      if (e.key === "Enter" && (!gameStarted || gameOver)) {
+        startGame();
       }
     });
-    document.addEventListener("keyup", (e) => {
-      keys[e.key] = false;
-    });
+    document.addEventListener("keyup", (e) => { keys[e.key] = false; });
 
     let touchStartX = null, touchStartY = null, touchCount = 0;
     canvas.addEventListener("touchstart", (e) => {
@@ -182,9 +164,11 @@
     // ───────────────────────────── Game Functions ─────────────────────────────
     function moveRocket() {
       if (keys["ArrowLeft"] && rocket.x > 0) rocket.x -= rocket.speed;
-      if (keys["ArrowRight"] && rocket.x + rocket.width < canvas.width) rocket.x += rocket.speed;
+      if (keys["ArrowRight"] && rocket.x + rocket.width < canvas.width)
+        rocket.x += rocket.speed;
       if (keys["ArrowUp"] && rocket.y > 0) rocket.y -= rocket.speed;
-      if (keys["ArrowDown"] && rocket.y + rocket.height < canvas.height) rocket.y += rocket.speed;
+      if (keys["ArrowDown"] && rocket.y + rocket.height < canvas.height)
+        rocket.y += rocket.speed;
       const fireRate = 300;
       if (keys[" "] && Date.now() - lastShotTime > fireRate) {
         fireBullet();
@@ -207,7 +191,6 @@
       }
     }
 
-    // Spawn enemy with difficulty scaling
     function spawnEnemy() {
       const enemyWidth = 60 * scale, enemyHeight = 60 * scale;
       const x = Math.random() * (canvas.width - enemyWidth);
@@ -235,7 +218,6 @@
       }, 1500);
     }
 
-    // We'll use a timer in the game loop for enemy spawns
     let enemySpawnTimer = 0;
     let enemySpawnInterval = 2000;
 
@@ -247,7 +229,8 @@
       enemyBullets = enemyBullets.filter(bullet => {
         bullet.y += bullet.speed;
         if (bullet.y > canvas.height) return false;
-        if (!invulnerable && bullet.x < rocket.x + rocket.width &&
+        if (!invulnerable &&
+            bullet.x < rocket.x + rocket.width &&
             bullet.x + bullet.width > rocket.x &&
             bullet.y < rocket.y + rocket.height &&
             bullet.y + bullet.height > rocket.y) {
@@ -261,7 +244,8 @@
     function updateEnemies() {
       enemies = enemies.filter(enemy => {
         enemy.y += enemy.speed;
-        if (!invulnerable && enemy.x < rocket.x + rocket.width &&
+        if (!invulnerable &&
+            enemy.x < rocket.x + rocket.width &&
             enemy.x + enemy.width > rocket.x &&
             enemy.y < rocket.y + rocket.height &&
             enemy.y + enemy.height > rocket.y) {
@@ -331,7 +315,6 @@
     }
 
     function drawRocket() {
-      // If invulnerable, draw the rocket semi-transparently
       if (invulnerable) ctx.globalAlpha = 0.5;
       ctx.drawImage(rocket.image, rocket.x, rocket.y, rocket.width, rocket.height);
       ctx.globalAlpha = 1;
@@ -377,7 +360,6 @@
     // ───────────────────────────── Main Game Loop ─────────────────────────────
     function gameLoop() {
       if (gameOver) {
-        // Save score online and show Game Over screen
         if (!playerName) playerName = "Unknown Player";
         saveScoreOnline(playerName, score);
         drawGameOverScreen();
@@ -386,7 +368,6 @@
       }
       
       if (paused) {
-        // Draw current state with a pause overlay (no state updates)
         drawStars();
         drawRocket();
         drawBullets();
@@ -403,8 +384,7 @@
         return;
       }
       
-      // Update timers and spawn enemies
-      enemySpawnTimer += 16; // approximate frame time in ms
+      enemySpawnTimer += 16;
       if (enemySpawnTimer > enemySpawnInterval) {
         spawnEnemy();
         enemySpawnTimer = 0;
@@ -417,7 +397,6 @@
       checkCollisions();
       updateExplosions();
       
-      // Draw all game objects
       drawStars();
       drawRocket();
       drawBullets();
@@ -428,9 +407,8 @@
       animationFrameId = requestAnimationFrame(gameLoop);
     }
 
-    // ───────────────────────────── Life & Collision Handling ─────────────────────────────
     function reduceLives() {
-      if (invulnerable) return; // Prevent multiple hits
+      if (invulnerable) return;
       lives--;
       if (lives <= 0) {
         gameOver = true;
@@ -489,6 +467,7 @@
       enemySpawnTimer = 0;
       bgMusic.currentTime = 0;
       bgMusic.play();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       gameLoop();
     }
 
@@ -529,24 +508,33 @@
 
     // ───────────────────────────── Start Screen & Username Input ─────────────────────────────
     document.addEventListener("DOMContentLoaded", () => {
+      // Check for a stored username in localStorage.
+      const storedName = localStorage.getItem("playerName");
+      if (storedName) {
+        window.telegramPlayerName = storedName;
+        playerName = storedName;
+      }
+      // Telegram WebApp integration.
       if (window.Telegram && window.Telegram.WebApp) {
         console.log("✅ Telegram WebApp API detected!");
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
         const user = window.Telegram.WebApp.initDataUnsafe?.user;
-        if (user) {
+        if (user && !storedName) {
           window.telegramPlayerName = user.username || `User${user.id}`;
           playerName = window.telegramPlayerName;
+          localStorage.setItem("playerName", playerName);
           console.log("✅ Telegram Username:", window.telegramPlayerName);
-        } else {
-          console.log("❌ No user data found in Telegram WebApp.");
+        } else if (!storedName) {
           window.telegramPlayerName = "Guest";
           playerName = window.telegramPlayerName;
         }
       } else {
         console.log("❌ Not running inside Telegram WebView.");
-        window.telegramPlayerName = "Guest";
-        playerName = window.telegramPlayerName;
+        if (!storedName) {
+          window.telegramPlayerName = "Guest";
+          playerName = window.telegramPlayerName;
+        }
       }
       drawStartScreen();
     });
@@ -556,7 +544,7 @@
       ctx.fillStyle = "white";
       ctx.textAlign = "center";
       ctx.font = `${18 * scale}px Arial`;
-      ctx.fillText("🚀 Rocket Shooting Game - V1.14 (Further Improved) 🚀", canvas.width / 2, canvas.height / 3 - 20);
+      ctx.fillText("🚀 Rocket Shooting Game - V1.15 (Persistent Username) 🚀", canvas.width / 2, canvas.height / 3 - 20);
       ctx.font = `${16 * scale}px Arial`;
       ctx.fillText("Double-Tap to Start", canvas.width / 2, canvas.height / 2);
       ctx.fillText("or Press ENTER", canvas.width / 2, canvas.height / 2 + 40);
@@ -655,7 +643,8 @@
       let input = document.getElementById("usernameInput");
       if (input && input.value.trim() !== "") {
         window.telegramPlayerName = input.value.trim();
-        playerName = input.value.trim();
+        playerName = window.telegramPlayerName;
+        localStorage.setItem("playerName", playerName);
         console.log("✅ Updated Username:", playerName);
         window.removeEventListener("resize", adjustForKeyboard);
         input.remove();
