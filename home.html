@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rocket Shooting Game - V1.15 (Persistent Username)</title>
+  <title>Rocket Shooting Game - V1.16 (Persistent Username, Flicker Fixed)</title>
   <!-- Firebase and Telegram scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
@@ -93,6 +93,7 @@
       canvas.height = window.innerHeight;
       scale = Math.max(canvas.width / 800, 1);
 
+      // Adjust rocket dimensions and position
       rocket.width = 60 * scale;
       rocket.height = 80 * scale;
       rocket.x = canvas.width / 2 - rocket.width / 2;
@@ -100,7 +101,10 @@
       rocket.speed = 6 * scale;
 
       initStars();
-      drawStartScreen();
+      // Only redraw the start screen if the username input overlay is NOT present.
+      if (!document.getElementById("overlay")) {
+        drawStartScreen();
+      }
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
@@ -544,7 +548,7 @@
       ctx.fillStyle = "white";
       ctx.textAlign = "center";
       ctx.font = `${18 * scale}px Arial`;
-      ctx.fillText("🚀 Rocket Shooting Game - V1.15 (Persistent Username) 🚀", canvas.width / 2, canvas.height / 3 - 20);
+      ctx.fillText("🚀 Rocket Shooting Game - V1.16 (Persistent Username, Flicker Fixed) 🚀", canvas.width / 2, canvas.height / 3 - 20);
       ctx.font = `${16 * scale}px Arial`;
       ctx.fillText("Double-Tap to Start", canvas.width / 2, canvas.height / 2);
       ctx.fillText("or Press ENTER", canvas.width / 2, canvas.height / 2 + 40);
